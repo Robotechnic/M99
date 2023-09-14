@@ -1,0 +1,24 @@
+:main
+	LDA 99
+	PSH A
+	LDA 99
+	PSH A
+	LDA 99
+	PSH A
+	CAL @comp
+	CAL @comp
+	POP R
+	STR 99
+	JMP 99
+
+:comp
+	POP A
+	POP B
+	SUB
+	JPP @comp-sup
+:comp-inf
+	PSH A
+	RET
+:comp-sup
+	PSH B
+	RET

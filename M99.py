@@ -30,6 +30,7 @@ TOKENS = [
 ]
 
 
+
 class M99:
     def __init__(self) -> None:
         self.update_event = None
@@ -44,7 +45,7 @@ class M99:
             0,  # A
             0,  # B
             0,  # PC
-            98,  # SB
+            98, # SB
             0,  # RA
         ]
         self._shutdown = False
@@ -218,33 +219,33 @@ class M99:
         identifier = opcode // 100
 
         match identifier:
-            case 0:
+            case 0: # STR
                 self[data] = self.reg[0]
-            case 1:
+            case 1: # LDA
                 self.reg[1] = self[data]
-            case 2:
+            case 2: # LDB
                 self.reg[2] = self[data]
-            case 3:
+            case 3: # MOV
                 reg1 = data // 10
                 reg2 = data % 10
                 self.reg[reg2] = self.reg[reg1]
-            case 4:
+            case 4: # ADD, SUB, MUL, PSH, POP, RET...
                 self.exec_reg_op(data)
-            case 5:
+            case 5: # JMP
                 self.reg[3] = data
-            case 6:
+            case 6: # JPP
                 if self.reg[0] > 0:
                     self.reg[3] = data - 1
-            case 7:
+            case 7: # JEQ
                 if self.reg[0] == 0:
                     self.reg[3] += 1
-            case 8:
+            case 8: # JNE
                 if self.reg[0] != 0:
                     self.reg[3] += 1
-            case 9:
+            case 9: # CAL
                 self.reg[5] = self.reg[3] + 1
-                self.reg[3] = data
-            case _:
+                self.reg[3] = data - 1
+            case _: # Not a valid identifier
                 raise ValueError("Invalid identifier.")
 
     def load(self, program: list[int], offset: int = 0) -> None:
@@ -260,6 +261,12 @@ class M99:
             raise ValueError("Program too long.")
 
         self.mem[offset : len(program) + offset] = program
+    
+    def clear(self) -> None:
+        """
+        Clear the memory of the M99 machine.
+        """
+        self.mem = [0] * 99
 
     def __getitem__(self, key: int) -> int:
         """
@@ -375,7 +382,7 @@ def scan_labels(labels: dict[str, int], lines: list[str]) -> str:
         if re.match(r"^\s*$", l):
             continue
 
-        if m := re.match(r"^\s*:([A-Za-z][a-zA-Z09_]+)$", l):
+        if m := re.match(r"^\s*:([A-Za-z][a-zA-Z09_\-]+)$", l):
             labels[m.group(1)] = address
         else:
             code.append(l)
@@ -397,7 +404,6 @@ def assemble(code: str) -> list[int]:
     labels = {}
     lines = code.split("\n")
     lines = scan_labels(labels, lines)
-    print(labels)
     
     line_nb = 0
     
@@ -436,8 +442,7 @@ def replace_labels(labels: dict[str, int], line: str) -> str:
     """
     
 
-    for m in re.finditer(r"@([a-zA-Z][a-zA-Z0-9_]*)", line):
-        print(m.group(1))
+    for m in re.finditer(r"@([a-zA-Z][a-zA-Z0-9_\-]*)", line):
         line = line.replace(m.group(0), str(labels[m.group(1)]))
 
     return line

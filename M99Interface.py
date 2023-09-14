@@ -241,6 +241,7 @@ class M99Interface(Frame):
         )
         Button(buttons, text="Load", command=self.load).grid(row=1, column=1)
         Button(buttons, text="Quit", command=self.quit).grid(row=1, column=2)
+        Button(buttons, text="Clear", command=self.machine.clear).grid(row=2, column=1)
         return buttons
 
     def next_instruction(self) -> None:
@@ -285,8 +286,9 @@ class M99Interface(Frame):
             program = program_file.read()
 
         try:
-            self.assembly = M99.M99.assemble(program)
+            self.assembly = M99.assemble(program)
             self.machine.load(self.assembly, 0)
+            self.machine.restart()
             self.update_display()
         except Exception as e:
             showerror("Error", f"An error occurred:\n {e}", parent=self)
