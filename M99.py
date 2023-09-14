@@ -12,23 +12,26 @@ import argparse
 # if argument is negative, it refer to a regex group
 # else it is a constant
 REGISTER_TOKENS = "(A|B|R|PC|SB|RA)"
+# None means ignore
+# -n means use the n-th regex group
+# n means use the constant n
 TOKENS = [
-    (r"^\s*STR ([0-9]{1,2})$", (0, 0, -1)),
-    (r"^\s*LDA ([0-9]{1,2})$", (1, 0, -1)),
-    (r"^\s*LDB ([0-9]{1,2})$", (2, 0, -1)),
-    (r"^\s*MOV " + REGISTER_TOKENS + " " + REGISTER_TOKENS + "$", (3, -1, -2)),
-    (r"^\s*ADD$", (4, 0, 0)),
-    (r"^\s*SUB$", (4, 0, 1)),
-    (r"^\s*MUL$", (4, 0, 2)),
-    (r"^\s*JMP ([0-9]{1,2})$", (5, 0, -1)),
-    (r"^\s*JPP ([0-9]{1,2})$", (6, 0, -1)),
-    (r"^\s*JEQ ([0-9]{1,2})$", (7, 0, 1)),
-    (r"^\s*JNE ([0-9]{1,2})$", (8, 0, 1)),
-    (r"^\s*CAL ([0-9]{1,2})$", (9, 0, -1)),
-    (r"^\s*RET$", (4, 0, 9)),
-    (r"^\s*PSH " + REGISTER_TOKENS + "$", (4, 8, -1)),
-    (r"^\s*POP " + REGISTER_TOKENS + "$", (4, 9, -1)),
-    (r"^\s*DAT ([0-9]{1,3})$", (0, 0, -1)),
+    (r"^\s*STR ([0-9]{1,2})\s*$", (0, 0, -1)),
+    (r"^\s*LDA ([0-9]{1,2})\s*$", (1, 0, -1)),
+    (r"^\s*LDB ([0-9]{1,2})\s*$", (2, 0, -1)),
+    (r"^\s*MOV " + REGISTER_TOKENS + " " + REGISTER_TOKENS + "\s*$", (3, -1, -2)),
+    (r"^\s*ADD\s*$", (4, 0, 0)),
+    (r"^\s*SUB\s*$", (4, 0, 1)),
+    (r"^\s*MUL\s*$", (4, 0, 2)),
+    (r"^\s*JMP ([0-9]{1,2})\s*$", (5, 0, -1)),
+    (r"^\s*JPP ([0-9]{1,2})\s*$", (6, 0, -1)),
+    (r"^\s*JEQ ([0-9]{1,2})\s*$", (7, 0, -1)),
+    (r"^\s*JNE ([0-9]{1,2})\s*$", (8, 0, -1)),
+    (r"^\s*CAL ([0-9]{1,2})\s*$", (9, 0, -1)),
+    (r"^\s*RET\s*$", (4, 0, 9)),
+    (r"^\s*PSH " + REGISTER_TOKENS + "\s*$", (4, 8, -1)),
+    (r"^\s*POP " + REGISTER_TOKENS + "\s*$", (4, 9, -1)),
+    (r"^\s*DAT ([0-9]{1,3})\s*$", (0, 0, -1)),
 ]
 
 

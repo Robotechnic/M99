@@ -26,6 +26,16 @@ INSTRUCTIONS_REPR = {
     9: ("CAL", 1),
 }
 
+def change_color(color, container):# set to root window
+    container.config(bg=color)
+    for child in container.winfo_children():
+        if child.winfo_children():
+            # child has children, go through its children
+            child.config(bg=color)
+            change_color(color, child)
+        elif type(child) is Label:
+            child.config(bg=color)
+        
 
 class MemoryCell(Frame):
     def __init__(self, master: Widget, value: int, **kwargs) -> None:
@@ -182,7 +192,19 @@ class M99Interface(Frame):
         """
         Update the register display.
         """
-        for i, reg in enumerate(self.registers_labels):
+        if self.machine._shutdown:
+            self.register_contener.config(
+                text="Registers (Shutdown)",
+            )
+            change_color("red", self.register_contener)
+            return
+        else:
+            self.register_contener.config(
+                text="Registers",
+            )
+            change_color("lightgrey", self.register_contener)
+        
+        for i in range(len(self.registers_labels)):
             self.reg_labels[i]["text"] = f"{self.machine.reg[i]}"
 
     def cell_color(self, i: int, j: int) -> str:
@@ -228,6 +250,17 @@ class M99Interface(Frame):
         """
         Update the memory display.
         """
+        if self.machine._shutdown:
+            self.memory_display.config(
+                text="Memory (Shutdown)",
+                bg="red"
+            )
+            return
+        else:
+            self.memory_display.config(
+                text="Memory",
+                bg="lightgrey"
+            )
         for i in range(10):
             for j in range(10):
                 if i == 9 and j == 9:
@@ -316,8 +349,10 @@ class M99Interface(Frame):
         It displays registers, memory, and the stack.
         A button is provided to execute the next instruction.
         """
-        self.build_register_display().grid(row=0, column=0)
-        self.build_memory_display().grid(row=0, column=1, rowspan=2)
+        self.register_contener = self.build_register_display()
+        self.register_contener.grid(row=0, column=0)
+        self.memory_display = self.build_memory_display()
+        self.memory_display.grid(row=0, column=1, rowspan=2)
         self.build_buttons().grid(row=1, column=0)
 
     def update_display(self) -> None:
