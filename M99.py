@@ -22,8 +22,8 @@ TOKENS = [
     (r"^\s*MUL$", (4, 0, 2)),
     (r"^\s*JMP ([0-9]{1,2})$", (5, 0, -1)),
     (r"^\s*JPP ([0-9]{1,2})$", (6, 0, -1)),
-    (r"^\s*JEQ ([0-9]{1,2})$", (7, 0, -1)),
-    (r"^\s*JNE ([0-9]{1,2})$", (8, 0, -1)),
+    (r"^\s*JEQ ([0-9]{1,2})$", (7, 0, 1)),
+    (r"^\s*JNE ([0-9]{1,2})$", (8, 0, 1)),
     (r"^\s*CAL ([0-9]{1,2})$", (9, 0, -1)),
     (r"^\s*RET$", (4, 0, 9)),
     (r"^\s*PSH " + REGISTER_TOKENS + "$", (4, 8, -1)),
@@ -238,10 +238,10 @@ class M99:
                 if self.reg[0] > 0:
                     self.reg[3] = data - 1
             case 7:  # JEQ
-                if self.reg[0] == 0:
+                if self.reg[0] == data:
                     self.reg[3] += 1
             case 8:  # JNE
-                if self.reg[0] != 0:
+                if self.reg[0] != data:
                     self.reg[3] += 1
             case 9:  # CAL
                 self.reg[5] = self.reg[3] + 1
@@ -364,7 +364,7 @@ def search_match(line: str, line_nb: int) -> tuple[re.Match, tuple[int, int, int
     raise ValueError(f"Invalid instruction at line {line_nb} : {line}")
 
 
-def preprocess(labels: dict[str, int], lines: list[(int, str)]) -> list[str]:
+def preprocess(labels: dict[str, int], lines: list[str]) -> list[(int, str)]:
     """
     Scan the code to find labels and return the code without labels
     This function also remove empty lines and comments
@@ -414,10 +414,10 @@ def assemble(code: str) -> list[int]:
 
     for line in lines:
         # skip empty lines
-
+        (line_nb, line) = line
         line = replace_labels(labels, line)
 
-        (instruction_match, token) = search_match(line[1], line[0])
+        (instruction_match, token) = search_match(line, line_nb)
         if token is None:
             continue
         opcode = token[0]
