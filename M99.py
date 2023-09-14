@@ -34,7 +34,6 @@ TOKENS = [
     (r"^\s*DAT ([0-9]{1,3})\s*$", (0, 0, -1)),
 ]
 
-
 class M99:
     def __init__(self) -> None:
         self.update_event = None
@@ -236,7 +235,7 @@ class M99:
             case 4:  # ADD, SUB, MUL, PSH, POP, RET...
                 self.exec_reg_op(data)
             case 5:  # JMP
-                self.reg[3] = data
+                self.reg[3] = data - 1
             case 6:  # JPP
                 if self.reg[0] > 0:
                     self.reg[3] = data - 1
