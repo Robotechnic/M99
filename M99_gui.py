@@ -91,7 +91,7 @@ class MemoryCell(Frame):
             self,
             text=f"{self.opcode_to_str(self.value)}",
             font=("Monospace", 10),
-            width=6,
+            width=7,
         )
         self.value_label.pack(side="top")
         self.instruction_label.pack(side="bottom")
@@ -267,7 +267,7 @@ class M99Interface(Frame):
         """
         try:
             self.machine.step()
-        except Exception as e:
+        except ValueError as e:
             showerror("Error", f"An error occurred: {e}", parent=self)
 
     def run_machine(self) -> None:
@@ -276,7 +276,7 @@ class M99Interface(Frame):
         """
         try:
             self.machine.run(-1)
-        except Exception as e:
+        except ValueError as e:
             showerror("Error", f"An error occurred: {e}", parent=self)
 
     def jump(self) -> None:
@@ -307,7 +307,7 @@ class M99Interface(Frame):
             self.machine.load(self.assembly, 0)
             self.machine.restart()
             self.update_display()
-        except Exception as e:
+        except ValueError as e:
             showerror("Error", f"An error occurred:\n {e}", parent=self)
 
     def create_widgets(self) -> None:

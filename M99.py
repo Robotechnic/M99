@@ -364,10 +364,10 @@ def search_match(line: str, line_nb: int) -> tuple[re.Match, tuple[int, int, int
     raise ValueError(f"Invalid instruction at line {line_nb} : {line}")
 
 
-def scan_labels(labels: dict[str, int], lines: list[str]) -> list[str]:
+def preprocess(labels: dict[str, int], lines: list[(int, str)]) -> list[str]:
     """
     Scan the code to find labels and return the code without labels
-    This function also remove empty lines
+    This function also remove empty lines and comments
 
     Args:
         labels (dict[str, int]): The labels dict
@@ -377,15 +377,21 @@ def scan_labels(labels: dict[str, int], lines: list[str]) -> list[str]:
         str: the code without labels
     """
     code = []
+    line_nb = 0
     address = 0
     for l in lines:
+        line_nb += 1
         if re.match(r"^\s*$", l):
+            continue
+        
+        if re.match(r"^\s*#", l):
             continue
 
         if m := re.match(r"^\s*:([A-Za-z][a-zA-Z09_\-]+)$", l):
             labels[m.group(1)] = address
         else:
-            code.append(l)
+            l = re.sub(r"\s*#.*", "", l)
+            code.append((line_nb, l))
             address += 1
     return code
 
@@ -404,17 +410,14 @@ def assemble(code: str) -> list[int]:
     program = []
     labels = {}
     lines = code.split("\n")
-    lines = scan_labels(labels, lines)
-
-    line_nb = 0
+    lines = preprocess(labels, lines)
 
     for line in lines:
         # skip empty lines
-        line_nb += 1
 
         line = replace_labels(labels, line)
 
-        (instruction_match, token) = search_match(line, line_nb)
+        (instruction_match, token) = search_match(line[1], line[0])
         if token is None:
             continue
         opcode = token[0]
@@ -444,6 +447,8 @@ def replace_labels(labels: dict[str, int], line: str) -> str:
     """
 
     for m in re.finditer(r"@([a-zA-Z][a-zA-Z0-9_\-]*)", line):
+        if m.group(1) not in labels:
+            raise ValueError(f"Undefined label {m.group(1)}")
         line = line.replace(m.group(0), str(labels[m.group(1)]))
 
     return line
