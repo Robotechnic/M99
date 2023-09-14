@@ -1,0 +1,144 @@
+# Compute the nth prime number in M99 assembly
+
+:main
+	LDA 99
+	PSH A
+	CAL @n-prime-number
+	STR 99
+	JMP 99
+
+:zero
+	DAT 0
+
+:one
+	DAT 1
+
+:two
+	DAT 2
+
+:tree
+	DAT 3
+
+# Compute modulus of two numbers
+# The first element in the stack is the divisor
+# The second element in the stack is the dividend
+# The result is in R at the end
+:mod
+	POP B
+	POP A
+:mod-loop
+	SUB
+	JPP @mod-loop-end
+	JEQ 0
+	JMP @mod-end
+:mod-loop-end
+	MOV R A
+	JMP @mod-loop
+:mod-end
+	MOV A R
+	RET
+
+
+# Check if a number is a prime number
+:is-prime
+	POP A
+	LDB @two # B act as the prime counter
+	SUB
+	JPP @is-prime-loop-init # if n <= 2, return false
+	JEQ 0
+	JMP @is-prime-end-true
+:is-prime-loop-init
+	LDB @tree # we only need to check odd numbers
+			  # because even numbers are not allowed
+:is-prime-loop
+	# save the current prime number
+	# the prime_counter
+	# and the return address
+	PSH A
+	PSH B
+	PSH RA
+
+	PSH A # this two PSH are POP by the mod function
+	PSH B
+	CAL @mod
+	POP RA
+	POP B
+
+	# if mod == 0, return false
+	JNE 0
+	JMP @is-prime-end-false
+
+	# check prime_counter
+	# if n <= prime-counter^2, return true
+	MOV B A
+	MUL
+	POP A
+	PSH B
+	MOV R B
+	SUB
+	POP B
+	JPP @is-prime-loop-end
+	JMP @is-prime-end-true
+
+:is-prime-loop-end
+	# increment prime_counter
+	PSH A
+	LDA @two
+	ADD
+	MOV R B
+	POP A
+	# restore the current prime number and
+	# the prime_counter
+	JMP @is-prime-loop
+:is-prime-end-false
+	POP A
+	LDA @zero
+	JMP @is-prime-end
+:is-prime-end-true
+	LDA @one
+:is-prime-end
+	PSH A
+	RET
+
+# Compute the nth prime number
+:n-prime-number
+	POP A
+	MOV A R
+	JNE 1 # if n == 0, return 2
+	JMP @n-prime-number-two
+
+	LDB @tree # current_prime = 3
+:n-prime-number-loop
+	PSH RA
+	PSH A
+	PSH B
+	PSH B
+	CAL @is-prime
+	POP B
+	LDA @one
+	SUB
+	POP B
+	POP A
+	POP RA
+	JEQ 0 # if is_prime(current_prime), decrement n
+	JMP @n-prime-loop-end
+	PSH B
+	LDB @one
+	SUB
+	POP B
+	JNE 1 # if n == 1, return current_prime
+	JMP @n-prime-number-loop-end
+	MOV R A
+:n-prime-loop-end
+	# increment current_prime by 2
+	PSH A
+	LDA @two
+	ADD
+	MOV R B
+	POP A
+	JMP @n-prime-number-loop
+:n-prime-number-two
+	LDB @two
+:n-prime-number-loop-end
+	MOV B R
+	RET

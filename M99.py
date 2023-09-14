@@ -448,7 +448,7 @@ def replace_labels(labels: dict[str, int], line: str) -> str:
         line (str): line to be processed.
     """
 
-    for m in re.finditer(r"@([a-zA-Z][a-zA-Z0-9_\-]*)", line):
+    for m in re.finditer(r"@([a-zA-Z][a-zA-Z0-9_\-]+)", line):
         if m.group(1) not in labels:
             raise ValueError(f"Undefined label {m.group(1)}")
         line = line.replace(m.group(0), str(labels[m.group(1)]))
