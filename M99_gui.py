@@ -185,6 +185,24 @@ class M99Interface(Frame):
         for i, reg in enumerate(self.registers_labels):
             self.reg_labels[i]["text"] = f"{self.machine.reg[i]}"
 
+    def cell_color(self, i: int, j: int) -> str:
+        """
+        Compute the background color of a cell based on the registers.
+
+        Args:
+            i (int): the row of the cell
+            j (int): the column of the cell
+
+        Returns:
+            str: the background color of the cell
+        """
+        bg = "white"
+        if self.machine.reg[4] == i * 10 + j:
+            bg = "lightgreen"
+        elif self.machine.reg[3] == i * 10 + j:
+            bg = "lightblue"
+        return bg
+
     def build_memory_display(self) -> LabelFrame:
         """
         In format of 10 rows of 10 columns.
@@ -199,11 +217,7 @@ class M99Interface(Frame):
                 if i == 9 and j == 9:
                     row.append(Label(memory, text="I/O"))
                 else:
-                    bg = "white"
-                    if self.machine.reg[4] == i * 10 + j:
-                        bg = "lightgreen"
-                    elif self.machine.reg[3] == i * 10 + j:
-                        bg = "lightblue"
+                    bg = self.cell_color(i, j)
                     row.append(MemoryCell(memory, self.machine.mem[i * 10 + j], bg=bg))
                 row[j].grid(row=j + 1, column=i + 1)
             self.mem_labels.append(row)
@@ -218,11 +232,7 @@ class M99Interface(Frame):
             for j in range(10):
                 if i == 9 and j == 9:
                     continue
-                bg = "white"
-                if self.machine.reg[4] == i * 10 + j:
-                    bg = "lightgreen"
-                elif self.machine.reg[3] == i * 10 + j:
-                    bg = "lightblue"
+                bg = self.cell_color(i, j)
                 self.mem_labels[i][j].set_opcode(self.machine.mem[i * 10 + j])
                 self.mem_labels[i][j].config(bg=bg)
 

@@ -364,7 +364,7 @@ def search_match(line: str, line_nb: int) -> tuple[re.Match, tuple[int, int, int
     raise ValueError(f"Invalid instruction at line {line_nb} : {line}")
 
 
-def scan_labels(labels: dict[str, int], lines: list[str]) -> str:
+def scan_labels(labels: dict[str, int], lines: list[str]) -> list[str]:
     """
     Scan the code to find labels and return the code without labels
     This function also remove empty lines
