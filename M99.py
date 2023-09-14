@@ -30,7 +30,6 @@ TOKENS = [
 ]
 
 
-
 class M99:
     def __init__(self) -> None:
         self.update_event = None
@@ -45,12 +44,12 @@ class M99:
             0,  # A
             0,  # B
             0,  # PC
-            98, # SB
+            98,  # SB
             0,  # RA
         ]
         self._shutdown = False
         self.emit_update_event()
-    
+
     def shutdown(self) -> None:
         self._shutdown = True
         self.emit_update_event()
@@ -219,33 +218,33 @@ class M99:
         identifier = opcode // 100
 
         match identifier:
-            case 0: # STR
+            case 0:  # STR
                 self[data] = self.reg[0]
-            case 1: # LDA
+            case 1:  # LDA
                 self.reg[1] = self[data]
-            case 2: # LDB
+            case 2:  # LDB
                 self.reg[2] = self[data]
-            case 3: # MOV
+            case 3:  # MOV
                 reg1 = data // 10
                 reg2 = data % 10
                 self.reg[reg2] = self.reg[reg1]
-            case 4: # ADD, SUB, MUL, PSH, POP, RET...
+            case 4:  # ADD, SUB, MUL, PSH, POP, RET...
                 self.exec_reg_op(data)
-            case 5: # JMP
+            case 5:  # JMP
                 self.reg[3] = data
-            case 6: # JPP
+            case 6:  # JPP
                 if self.reg[0] > 0:
                     self.reg[3] = data - 1
-            case 7: # JEQ
+            case 7:  # JEQ
                 if self.reg[0] == 0:
                     self.reg[3] += 1
-            case 8: # JNE
+            case 8:  # JNE
                 if self.reg[0] != 0:
                     self.reg[3] += 1
-            case 9: # CAL
+            case 9:  # CAL
                 self.reg[5] = self.reg[3] + 1
                 self.reg[3] = data - 1
-            case _: # Not a valid identifier
+            case _:  # Not a valid identifier
                 raise ValueError("Invalid identifier.")
 
     def load(self, program: list[int], offset: int = 0) -> None:
@@ -261,7 +260,7 @@ class M99:
             raise ValueError("Program too long.")
 
         self.mem[offset : len(program) + offset] = program
-    
+
     def clear(self) -> None:
         """
         Clear the memory of the M99 machine.
@@ -343,9 +342,8 @@ class M99:
         while not self._shutdown:
             self.step()
 
-def search_match(
-    line: str, line_nb: int
-) -> tuple[re.Match, tuple[int, int, int]]:
+
+def search_match(line: str, line_nb: int) -> tuple[re.Match, tuple[int, int, int]]:
     """
     Search for a match in the given line.
 
@@ -389,6 +387,7 @@ def scan_labels(labels: dict[str, int], lines: list[str]) -> str:
             address += 1
     return code
 
+
 def assemble(code: str) -> list[int]:
     """
     Assemble the given code into a program for the M99 machine.
@@ -404,15 +403,15 @@ def assemble(code: str) -> list[int]:
     labels = {}
     lines = code.split("\n")
     lines = scan_labels(labels, lines)
-    
+
     line_nb = 0
-    
+
     for line in lines:
-        #skip empty lines
+        # skip empty lines
         line_nb += 1
-        
+
         line = replace_labels(labels, line)
-        
+
         (instruction_match, token) = search_match(line, line_nb)
         if token is None:
             continue
@@ -432,6 +431,7 @@ def assemble(code: str) -> list[int]:
 
     return program
 
+
 def replace_labels(labels: dict[str, int], line: str) -> str:
     """
     Replace labels in the given line.
@@ -440,12 +440,12 @@ def replace_labels(labels: dict[str, int], line: str) -> str:
         labels (dict[str, int]): labels dict.
         line (str): line to be processed.
     """
-    
 
     for m in re.finditer(r"@([a-zA-Z][a-zA-Z0-9_\-]*)", line):
         line = line.replace(m.group(0), str(labels[m.group(1)]))
 
     return line
+
 
 if __name__ == "__main__":
     assembly = assemble(
