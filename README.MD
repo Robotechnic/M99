@@ -38,18 +38,18 @@ Under the values, the ASM code is displayed if it is relevant and valid.
 
 The stack pointer is represented by a light blue square and the program counter by a light green square.
 
-#### Controls buttons
+#### Controls
 
 There are 7 buttons:
-| Button | Description |
-| :----: | :---------: |
-| `Load` | Load a M99 program from a file |
-| `Jump` | Jump to a specific address |
-| `Execute` | Execute the program until the end |
-| `Step` | Execute the next instruction |
-| `Reset` | Reset the registers |
-| `Clear` | Clear the memory |
-| `Quit` | Quit the program |
+| Button | Description | Key binding |
+| :----: | :---------: | :---------: |
+| `Load` | Load a M99 program from a file | `l` |
+| `Jump` | Jump to a specific address | `j` |
+| `Execute` | Execute the program until the end |  |
+| `Step` | Execute the next instruction | `Enter` |
+| `Reset` | Reset the registers | `r` |
+| `Clear` | Clear the memory | `c` and `Backspace` |
+| `Quit` | Quit the program | `q` |
 
 ## Dependencies
 

@@ -242,6 +242,13 @@ class M99Interface(Frame):
         Button(buttons, text="Load", command=self.load).grid(row=1, column=1)
         Button(buttons, text="Quit", command=self.quit).grid(row=1, column=2)
         Button(buttons, text="Clear", command=self.machine.clear).grid(row=2, column=1)
+        self.master.bind("<Return>",  lambda _: self.next_instruction())
+        self.master.bind("<BackSpace>", lambda _: self.machine.clear())
+        self.master.bind("<q>", lambda _: self.quit())
+        self.master.bind("<c>", lambda _: self.machine.clear())
+        self.master.bind("<l>", lambda _: self.load())
+        self.master.bind("<j>", lambda _: self.jump())
+        self.master.bind("<r>", lambda _: self.machine.restart())
         return buttons
 
     def next_instruction(self) -> None:
