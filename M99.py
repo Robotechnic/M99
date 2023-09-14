@@ -5,6 +5,8 @@
 M99 Machine
 """
 import re
+import sys
+import argparse
 
 # Token format: (regex, (opcode, arg1, arg2, ...))
 # if argument is negative, it refer to a regex group
@@ -448,30 +450,26 @@ def replace_labels(labels: dict[str, int], line: str) -> str:
 
 
 if __name__ == "__main__":
-    assembly = assemble(
-        """
-    LDA 99
-    PSH A
-    LDA 99
-    PSH A
-    LDA 99
-    PSH A
-    CAL @comp
-    CAL @comp
-    POP R
-    STR 99
-    JMP 99
-    :comp
-    POP A
-    POP B
-    SUB
-    JPP 81
-    PSH A
-    RET
-    PSH B
-    RET
-    """
+    parser = argparse.ArgumentParser(
+        description="M99 Machine Emulator",
+        epilog = "Error codes: 1: Assembler error 2: Runtime error"
     )
-    pc = M99()
-    pc.load(assembly, 40)
-    pc.run(64)
+    parser.add_argument("file", type=argparse.FileType("r"), help="file to assemble and run")
+    
+    args = parser.parse_args()
+    with open(args.file.name, "r") as f:
+        code = f.read()
+    
+    try:
+        program = assemble(code)
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
+    
+    m99 = M99()
+    try:
+        m99.load(program)
+        m99.run()
+    except ValueError as e:
+        print(e)
+        sys.exit(2)

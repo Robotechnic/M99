@@ -5,11 +5,21 @@ This emulator allows you to run M99 programs on your computer and to run them st
 
 ## Usage
 
+### Command line
+
 The python file [M99.py](M99.py) is the main file of the emulator. It can be used as a module or as a standalone program and it allow to run the M99 but you can't see the registers and memory change in real time.
 
-The python file [M99_gui.py](M99_gui.py) is a standalone program that allow you to run the M99 and to see the registers and memory change in real time. In a graphical interface.
+```sh
+M99.py [-h] file
+```
+
+The file argument is the path to the M99 program to run.
+
+The program will fail with code 1 if there is a syntax error or with code 2 if there is a runtime error.
 
 ### Gui
+
+The python file [M99_gui.py](M99_gui.py) is a standalone program that allow you to run the M99 and to see the registers and memory change in real time. In a graphical interface.
 
 The gui is composed of 3 parts:
 
