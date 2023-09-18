@@ -16,39 +16,36 @@
 :two
 	DAT 2
 
-:tree
+:three
 	DAT 3
 
-# Compute modulus of two numbers
-# The first element in the stack is the divisor
-# The second element in the stack is the dividend
+# Compute modulus of two numbers as an instruction
+# Register A is the divisor
+# Register B is the dividend
 # The result is in R at the end
 :mod
-	POP B
-	POP A
-:mod-loop
 	SUB
 	JPP @mod-loop-end
 	JEQ 0
 	JMP @mod-end
 :mod-loop-end
 	MOV R A
-	JMP @mod-loop
+	JMP @mod
 :mod-end
 	MOV A R
 	RET
 
-
 # Check if a number is a prime number
+# Register A is the prime number to check (Odd)
+# The result is stored in R register
 :is-prime
-	POP A
 	LDB @two # B act as the prime counter
 	SUB
 	JPP @is-prime-loop-init # if n <= 2, return false
 	JEQ 0
 	JMP @is-prime-end-true
 :is-prime-loop-init
-	LDB @tree # we only need to check odd numbers
+	LDB @three # we only need to check odd numbers
 			  # because even numbers are not allowed
 :is-prime-loop
 	# save the current prime number
@@ -58,8 +55,6 @@
 	PSH B
 	PSH RA
 
-	PSH A # this two PSH are POP by the mod function
-	PSH B
 	CAL @mod
 	POP RA
 	POP B
@@ -87,34 +82,35 @@
 	ADD
 	MOV R B
 	POP A
-	# restore the current prime number and
-	# the prime_counter
 	JMP @is-prime-loop
 :is-prime-end-false
 	POP A
-	LDA @zero
 	JMP @is-prime-end
 :is-prime-end-true
 	LDA @one
+	MOV A R
 :is-prime-end
-	PSH A
 	RET
 
 # Compute the nth prime number
 :n-prime-number
 	POP A
 	MOV A R
-	JNE 1 # if n == 0, return 2
+	JNE 1 # if n == 1, return 2
 	JMP @n-prime-number-two
-
-	LDB @tree # current_prime = 3
+	JNE 2 # if n == 2, return 3
+	JMP @n-prime-number-three
+	LDB @two
+	SUB
+	MOV R A
+	LDB @three # current_prime = 3
 :n-prime-number-loop
 	PSH RA
 	PSH A
 	PSH B
-	PSH B
+	MOV B A
 	CAL @is-prime
-	POP B
+	MOV R B
 	LDA @one
 	SUB
 	POP B
@@ -126,8 +122,9 @@
 	LDB @one
 	SUB
 	POP B
-	JNE 1 # if n == 1, return current_prime
+	JPP @n-prime-loop-end-counter # if n <= 0, return current_prime
 	JMP @n-prime-number-loop-end
+:n-prime-loop-end-counter
 	MOV R A
 :n-prime-loop-end
 	# increment current_prime by 2
@@ -139,6 +136,10 @@
 	JMP @n-prime-number-loop
 :n-prime-number-two
 	LDB @two
+	JMP @n-prime-number-loop-end
+:n-prime-number-three
+	LDB @three
+	JMP @n-prime-number-loop-end
 :n-prime-number-loop-end
 	MOV B R
 	RET
