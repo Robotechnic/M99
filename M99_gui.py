@@ -158,18 +158,19 @@ class M99Interface(Frame):
         self.registers_labels = ["R", "A", "B", "PC", "SB", "RA"]
         self.reg_labels = []
         for i, reg in enumerate(self.registers_labels):
+            cell = Frame(registers, borderwidth=1, relief="solid")
             self.reg_labels.append(
                 Label(
-                    registers,
+                    cell,
                     text=f"{self.machine.reg[i]}",
-                    height=2,
                     font=("Monospace", 20),
                 )
             )
-            Label(registers, text=f"{reg}:", height=2, font=("Monospace", 20)).grid(
-                row=i, column=0
+            Label(cell, text=f"{reg}", width=4, font=("Monospace", 20)).pack(
+                side="top"
             )
-            self.reg_labels[i].grid(row=i, column=1)
+            self.reg_labels[i].pack(side="bottom")
+            cell.grid(row=0, column=i)
 
         return registers
 
@@ -350,10 +351,10 @@ class M99Interface(Frame):
         A button is provided to execute the next instruction.
         """
         self.register_contener = self.build_register_display()
-        self.register_contener.grid(row=0, column=0)
+        self.register_contener.grid(row=1, column=0)
         self.memory_display = self.build_memory_display()
-        self.memory_display.grid(row=0, column=1, rowspan=2)
-        self.build_buttons().grid(row=1, column=0)
+        self.memory_display.grid(row=0, column=0, columnspan=2)
+        self.build_buttons().grid(row=1, column=1)
 
     def update_display(self) -> None:
         """
