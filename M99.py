@@ -270,6 +270,7 @@ class M99:
         Clear the memory of the M99 machine.
         """
         self.mem = [0] * 99
+        self.emit_update_event()
 
     def __getitem__(self, key: int) -> int:
         """
